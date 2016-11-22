@@ -3,11 +3,11 @@
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution. 
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * The Eclipse Public License is available at 
+ * The Eclipse Public License is available at
  *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at 
+ * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
@@ -296,6 +296,7 @@ int MQTTSPacket_send_subAck(Clients* client, MQTTS_Subscribe* sub, int topicId, 
 int MQTTSPacket_send_unsubAck(Clients* client, int msgId);
 int MQTTSPacket_send_register(Clients* client, int topicId, char* topicName, int msgId);
 int MQTTSPacket_send_advertise(int sock, char* address, unsigned char gateway_id, short duration);
+int MQTTSPacket_send_gwinfo(int sock, char* address, unsigned char gateway_id);
 
 
 int MQTTSPacket_send_connect(Clients* client);

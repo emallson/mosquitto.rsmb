@@ -3,11 +3,11 @@
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution. 
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * The Eclipse Public License is available at 
+ * The Eclipse Public License is available at
  *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at 
+ * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
@@ -816,7 +816,7 @@ int MQTTSPacket_send_connack(Clients* client, int returnCode)
 	buf = MQTTSSerialize_connack(returnCode);
 	rc = MQTTSPacket_sendPacketBuffer(client->socket, client->addr, buf);
 	free(buf.data);
-	Log(LOG_PROTOCOL, 40, NULL, socket, client->addr, client->clientID, returnCode, rc);	
+	Log(LOG_PROTOCOL, 40, NULL, socket, client->addr, client->clientID, returnCode, rc);
 	FUNC_EXIT;
 	return rc;
 }
@@ -1057,13 +1057,27 @@ int MQTTSPacket_send_advertise(int sock, char* address, unsigned char gateway_id
 
 	FUNC_ENTRY;
 	buf = MQTTSPacketSerialize_advertise(gateway_id, duration);
-	
+
 	rc = MQTTSPacket_sendPacketBuffer(sock, address, buf);
 	free(buf.data);
 
 	Log(LOG_PROTOCOL, 30, NULL, sock, "", address, gateway_id, duration, rc);
 	FUNC_EXIT_RC(rc);
 	return rc;
+}
+
+int MQTTSPacket_send_gwinfo(int sock, char* address, unsigned char gateway_id) {
+  PacketBuffer buf;
+  int rc = 0;
+  FUNC_ENTRY;
+  buf = MQTTSPacketSerialize_gwinfo(gateway_id);
+
+  rc = MQTTSPacket_sendPacketBuffer(sock, address, buf);
+  free(buf.data);
+
+  /* Log(LOG_PROTOCOL, 30, NULL, sock, "", address, gateway_id, rc); */
+  FUNC_EXIT_RC(rc);
+  return rc;
 }
 
 
@@ -1077,7 +1091,7 @@ int MQTTSPacket_send_connect(Clients* client)
 
 	FUNC_ENTRY;
 	buf = MQTTSPacketSerialize_connect(client->cleansession, (client->will != NULL), 1, client->keepAliveInterval, client->clientID);
-	
+
 	rc = MQTTSPacket_sendPacketBuffer(client->socket, client->addr, buf);
 	free(buf.data);
 
