@@ -247,8 +247,9 @@ void MQTTSProtocol_timeslice(int sock)
 	}
 	else
 	{
-		(*handle_packets[(int)pack->header.type])(pack, sock, clientAddr, client);
-		/* TODO:
+      printf("DOS: handling packet %d\n", pack->header.type);
+      (*handle_packets[(int)pack->header.type])(pack, sock, clientAddr, client);
+        /* TODO:
 		 *  - error handling
 		 *  - centralise calls to time( &(c->lastContact) ); (currently in each _handle* function
 		 */
@@ -297,14 +298,8 @@ int MQTTSProtocol_handleSearchGws(void* pack, int sock, char* clientAddr, Client
 {
   ListElement* elem = NULL;
   Listener* listener = NULL;
-  unsigned char gateway_id = 0;
-
-  // hacky partial impl -- send gwinfo to the requester.
-  while(ListNextElement(bstate->listeners, &elem)) {
-    listener = (Listener*)elem->content;
-    gateway_id = listener->advertise->gateway_id;
-    break;
-  }
+  unsigned char gateway_id = 'x';
+  printf("DOS: searchgw received from %s\n", clientAddr);
   return MQTTSPacket_send_gwinfo(sock, clientAddr, gateway_id);
 }
 
@@ -482,6 +477,7 @@ int MQTTSProtocol_handleConnects(void* pack, int sock, char* clientAddr, Clients
 		MQTTProtocol_processQueued(client);
 
 	Log(LOG_INFO, 0, "Client connected to udp port %d from %s (%s)", list->port, client->clientID, clientAddr);
+    Log(LOG_INFO, 0, "Client %s keep-alive %d", client->clientID, client->keepAliveInterval);
 
 	MQTTSPacket_free_packet(pack);
 	time( &(client->lastContact) );

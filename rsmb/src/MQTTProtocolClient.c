@@ -3,11 +3,11 @@
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution. 
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * The Eclipse Public License is available at 
+ * The Eclipse Public License is available at
  *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at 
+ * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
@@ -556,13 +556,28 @@ int MQTTProtocol_handlePubcomps(void* pack, int sock, Clients* client)
 void MQTTProtocol_keepalive(time_t now)
 {
 	Node* current = NULL;
+    bool transition = false;
 
 	FUNC_ENTRY;
 	current = TreeNextElement(bstate->clients, current);
 	while (current)
 	{
 		Clients* client =	(Clients*)(current->content);
+        printf("DOS: Handling client %s with keep-alive interval %d\n", client->clientID, client->keepAliveInterval);
+#if defined(MQTTS)
+        if(transition) {
+          current = TreeNextElement(bstate->mqtts_clients, current);
+        } else {
+          current = TreeNextElement(bstate->clients, current);
+
+          if(!current) {
+            transition = true;
+            current = TreeNextElement(bstate->mqtts_clients, current);
+          }
+        }
+#else
 		current = TreeNextElement(bstate->clients, current);
+#endif
 #if !defined(NO_BRIDGE)
 		if (client->outbound)
 		{
@@ -593,7 +608,8 @@ void MQTTProtocol_keepalive(time_t now)
 		}
 		else
 #endif
-		if (client->connected && client->keepAliveInterval > 0
+
+        if (client->connected && client->keepAliveInterval > 0
 					&& (difftime(now, client->lastContact) > 2*(client->keepAliveInterval)))
 		{ /* zero keepalive interval means never disconnect */
 			Log(LOG_INFO, 24, NULL, client->keepAliveInterval, client->clientID);
@@ -626,9 +642,9 @@ int MQTTProtocol_processQueued(Clients* client)
 	while (client->good && Socket_noPendingWrites(client->socket) && /* no point in starting a publish if a write is still pending */
 		client->outboundMsgs->count < bstate->max_inflight_messages &&
 		queuedMsgsCount(client) > 0
-#if defined(QOS0_SEND_LIMIT) 
+#if defined(QOS0_SEND_LIMIT)
 		&& qos0count < bstate->max_inflight_messages /* an arbitrary criterion - but when would we restart? */
-#endif 
+#endif
 		#if defined(MQTTS)
 		&& (client->protocol == PROTOCOL_MQTT || client->outboundMsgs->count == 0)
 #endif
@@ -663,7 +679,7 @@ int MQTTProtocol_processQueued(Clients* client)
 #endif
 #if defined(QOS0_SEND_LIMIT)
 		if (m->qos == 0)
-			++qos0count; 
+			++qos0count;
 #endif
 
 		pubrc = MQTTProtocol_startQueuedPublish(client, m);
@@ -1013,4 +1029,3 @@ void MQTTProtocol_freeMessageList(List* msgList)
 	ListFree(msgList);
 	FUNC_EXIT;
 }
-

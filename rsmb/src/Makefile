@@ -30,15 +30,15 @@ TARGETS = broker broker_dbg broker_mqtts rsmb.ini
 
 all: $(TARGETS)
 
-broker: *.c *.h 
+broker: *.c *.h
 	$(CC) -Wall -Os *.c -o broker
 
 broker_dbg: *.c *.h
 	$(CC) -Wall -ggdb *.c -o broker_dbg
 
 broker_mqtts: *.c *.h
-	$(CC) -DMQTTS -Wall -Os *.c -o broker_mqtts
-	
+	$(CC) -ggdb -DMQTTS -Wall -Os *.c -o broker_mqtts
+
 broker_mqtts32: *.c *.h
 	$(CC) -m32 -DMQTTS -Wall -Os *.c -o broker_mqtts32
 

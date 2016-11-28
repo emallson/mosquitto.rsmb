@@ -696,6 +696,7 @@ int MQTTSPacket_sendPacketBuffer(int socket, char* addr, PacketBuffer buf)
 	int rc = 0;
 
 	FUNC_ENTRY;
+    printf("DOS: address %s\n", addr);
 	port = strrchr(addr, ':') + 1;
 	*(port - 1) = '\0';
 	if (strchr(addr, ':'))
@@ -1074,6 +1075,8 @@ int MQTTSPacket_send_gwinfo(int sock, char* address, unsigned char gateway_id) {
 
   rc = MQTTSPacket_sendPacketBuffer(sock, address, buf);
   free(buf.data);
+
+  printf("DOS: gwinfo sent to %s\n", address);
 
   /* Log(LOG_PROTOCOL, 30, NULL, sock, "", address, gateway_id, rc); */
   FUNC_EXIT_RC(rc);
